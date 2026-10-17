@@ -1,0 +1,25 @@
+@import 'tailwindcss';
+
+/* TruVision Design System */
+:root {
+  --color-primary: #64b5f6;
+  --color-accent: #4caf50;
+  --color-bg: #0f0f0f;
+  --color-surface: #1a1a1a;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-text: #e8e8e8;
+  --color-muted: #888;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,27 @@
+{
+  "name": "truvision-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "description": "TruVision — Real-time ISL accessibility for Google Meet",
+  "scripts": {
+    "prepare": "husky",
+    "lint": "npm run lint --prefix extension",
+    "typecheck": "npm run typecheck --prefix extension",
+    "build": "npm run build --prefix extension",
+    "format": "npm run format --prefix extension",
+    "test": "npm run typecheck && npm run lint"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0"
+  },
+  "lint-staged": {
+    "extension/src/**/*.{ts,tsx}": [
+      "eslint --max-warnings 0 --no-eslintrc -c extension/eslint.config.js",
+      "prettier --write"
+    ],
+    "extension/src/**/*.css": [
+      "prettier --write"
+    ]
+  }
+}

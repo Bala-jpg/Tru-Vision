@@ -1,0 +1,45 @@
+# TruVision Monorepo
+
+# .gitignore for root workspace:
+
+# ─── Node ───────────────────────────────────────────────────────────────────
+node_modules/
+dist/
+.cache/
+
+# ─── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+.uv/
+*.egg-info/
+dist/
+build/
+
+# ─── ML Artifacts ────────────────────────────────────────────────────────────
+backend/ml/sign_model/weights/*.h5
+backend/ml/sign_model/weights/*.keras
+backend/ml/sign_model/weights/*.savedmodel
+backend/ml/data/dataset/
+
+# ─── Secrets ─────────────────────────────────────────────────────────────────
+.env
+.env.*
+!.env.example
+*.pem
+service-account.json
+
+# ─── OS ──────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editor ──────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+
+# ─── Logs ────────────────────────────────────────────────────────────────────
+*.log
+npm-debug.log*

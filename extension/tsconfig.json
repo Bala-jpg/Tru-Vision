@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "types": ["chrome"],
+    "lib": ["ES2023", "DOM"]
+  },
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
