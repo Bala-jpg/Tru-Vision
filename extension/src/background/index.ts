@@ -111,7 +111,7 @@ chrome.runtime.onMessage.addListener(
 
       case 'STREAM_AUDIO_CHUNK':
         if (payload?.chunk) {
-          signWs?.send(payload.chunk as ArrayBuffer)
+          speechWs?.send(payload.chunk as ArrayBuffer)
         }
         break
 

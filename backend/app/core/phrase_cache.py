@@ -13,8 +13,9 @@ PHRASE_CACHE = {
     "meeting": "The meeting is starting.",
     "tomorrow": "Tomorrow.",
     "me join": "I will join.",
-    "tomorrow meeting me join": "I will join the meeting tomorrow."
+    "tomorrow meeting me join": "I will join the meeting tomorrow.",
 }
+
 
 def lookup_phrase(phrase: str) -> str | None:
     """

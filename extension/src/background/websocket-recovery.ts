@@ -1,11 +1,12 @@
 export class WebSocketRecoveryManager<T = unknown> {
   private wsUrl: string
   private ws: WebSocket | null = null
-  private isConnecting = false
   private reconnectAttempts = 0
   private maxReconnectAttempts = 5
   private reconnectInterval = 3000 // 3 seconds
   private keepAliveInterval: ReturnType<typeof setInterval> | null = null
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null
+  private isIntentionalDisconnect = false
   private onMessageCallback: ((msg: T) => void) | null = null
 
   constructor(wsUrl: string) {
@@ -22,7 +23,7 @@ export class WebSocketRecoveryManager<T = unknown> {
     }
 
     this.onMessageCallback = onMessage
-    this.isConnecting = true
+    this.isIntentionalDisconnect = false
     this.updateStatus('connecting')
 
     console.log(`Attempting connection to ${this.wsUrl}...`)
@@ -31,7 +32,6 @@ export class WebSocketRecoveryManager<T = unknown> {
       this.ws.binaryType = 'arraybuffer'
 
       this.ws.onopen = () => {
-        this.isConnecting = false
         this.reconnectAttempts = 0
         this.updateStatus('connected')
         console.log('WebSocket connection established successfully.')
@@ -52,7 +52,7 @@ export class WebSocketRecoveryManager<T = unknown> {
       this.ws.onclose = () => {
         this.updateStatus('disconnected')
         this.stopKeepAlive()
-        if (!this.isConnecting) {
+        if (!this.isIntentionalDisconnect) {
           this.handleReconnection()
         }
       }
@@ -75,6 +75,11 @@ export class WebSocketRecoveryManager<T = unknown> {
   }
 
   public disconnect() {
+    this.isIntentionalDisconnect = true
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
     this.stopKeepAlive()
     if (this.ws) {
       this.ws.close()
@@ -91,13 +96,13 @@ export class WebSocketRecoveryManager<T = unknown> {
     }
 
     this.reconnectAttempts++
-    this.isConnecting = true
     const delay = this.reconnectInterval * Math.pow(1.5, this.reconnectAttempts - 1)
     console.log(
       `Reconnecting in ${delay}ms (Attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})...`
     )
 
-    setTimeout(() => {
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null
       if (this.onMessageCallback) {
         this.connect(this.onMessageCallback)
       }

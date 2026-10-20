@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from app.api import rest_correction, rest_tts, rest_preferences
+
+from app.api import rest_correction, rest_preferences, rest_tts
 
 api_router = APIRouter()
 

@@ -1,6 +1,7 @@
 import os
 import sys
 
+
 def download_include_dataset():
     """
     Downloads the AI4Bharat INCLUDE dataset (pre-extracted MediaPipe landmarks format)
@@ -15,7 +16,7 @@ def download_include_dataset():
 
     # Check for kaggle package
     try:
-        import kaggle
+        from kaggle.api.kaggle_api_extended import KaggleApi
     except ImportError:
         print("Error: The 'kaggle' python package is not installed.")
         print("Please install it via: pip install kaggle")
@@ -24,17 +25,19 @@ def download_include_dataset():
 
     print(f"Initiating download for Kaggle dataset: '{dataset_slug}'...")
     try:
-        from kaggle.api.kaggle_api_extended import KaggleApi
         api = KaggleApi()
         api.authenticate()
-        
+
         # Download and unzip directly
         api.dataset_download_files(dataset_slug, path=dataset_dir, unzip=True)
         print("INCLUDE dataset download and extraction complete!")
     except Exception as e:
         print(f"Failed to download dataset: {e}")
         print("Please verify your Kaggle API credentials.")
-        print(f"Alternatively, download it manually from: https://www.kaggle.com/datasets/{dataset_slug}")
+        print(
+            f"Alternatively, download it manually from: https://www.kaggle.com/datasets/{dataset_slug}"
+        )
+
 
 if __name__ == "__main__":
     download_include_dataset()

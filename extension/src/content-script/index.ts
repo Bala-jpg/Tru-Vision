@@ -7,6 +7,11 @@ const domAdapter = MeetDOMAdapter.getInstance()
 let isSessionActive = false
 let webcamStream: MediaStream | null = null
 let captureInterval: ReturnType<typeof setInterval> | null = null
+let preferences = {
+  tts_enabled: true,
+  captions_enabled: true,
+  sign_detection_enabled: true,
+}
 
 // ─── Session Lifecycle ──────────────────────────────────────────────────────
 
@@ -93,6 +98,7 @@ function startWebcamCapture() {
       webcamStream = stream
       // 10 FPS mock landmark stream — replaced by real MediaPipe extraction in Phase 3
       captureInterval = setInterval(() => {
+        if (!preferences.sign_detection_enabled) return
         const mockLandmarks = Array.from({ length: 126 }, () => Math.random() * 0.1)
         chrome.runtime.sendMessage({
           type: 'STREAM_LANDMARKS',
@@ -125,6 +131,7 @@ chrome.runtime.onMessage.addListener(
     const shadow = anchor.shadowRoot
 
     if (type === 'SIGN_RECOGNIZED') {
+      if (!preferences.sign_detection_enabled) return
       const panel = shadow.getElementById('truvision-signs-panel')
       if (panel) {
         const sign = payload.sign as string
@@ -132,9 +139,12 @@ chrome.runtime.onMessage.addListener(
         panel.innerHTML = `Sign: <strong style="color:#64B5F6;">${sign}</strong> <span style="color:#888;">(${confidence}%)</span>`
 
         // Phase 1: Request TTS audio synthesis for this sign
-        chrome.runtime.sendMessage({ type: 'PLAY_TTS_AUDIO', payload: { audioBase64: '' } })
+        if (preferences.tts_enabled) {
+          chrome.runtime.sendMessage({ type: 'PLAY_TTS_AUDIO', payload: { audioBase64: '' } })
+        }
       }
     } else if (type === 'SPEECH_TRANSCRIBED') {
+      if (!preferences.captions_enabled) return
       const panel = shadow.getElementById('truvision-captions-panel')
       if (panel) {
         panel.innerHTML = `<span style="font-style:normal; color:#e8e8e8;">${payload.text as string}</span>`
@@ -146,6 +156,20 @@ chrome.runtime.onMessage.addListener(
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
 
 setInterval(checkSession, 2000)
+
+chrome.storage.local.get('user_preferences', (result) => {
+  const storedPreferences = result['user_preferences']
+  if (storedPreferences && typeof storedPreferences === 'object') {
+    preferences = { ...preferences, ...storedPreferences }
+  }
+})
+
+chrome.storage.onChanged.addListener((changes) => {
+  const updatedPreferences = changes['user_preferences']?.newValue
+  if (updatedPreferences && typeof updatedPreferences === 'object') {
+    preferences = { ...preferences, ...updatedPreferences }
+  }
+})
 
 domAdapter.onMuteChange((muted: boolean) => {
   console.log(`Mic state: ${muted ? 'MUTED' : 'LIVE'}`)

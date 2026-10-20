@@ -1,34 +1,41 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+
 
 class CorrectionRequest(BaseModel):
     text: str = Field(..., description="Raw gesture sequence text classification output")
-    context: Optional[List[str]] = Field(default=[], description="List of previous conversation sentences for context")
+    context: list[str] | None = Field(
+        default=[], description="List of previous conversation sentences for context"
+    )
+
 
 class CorrectionResponse(BaseModel):
     original: str
     corrected: str
     latency_ms: int
 
+
 class SynthesizeRequest(BaseModel):
     text: str = Field(..., description="Sentence text to synthesize to speech")
-    voice: Optional[str] = Field(default="en-IN-Wavenet-B", description="GCP TTS voice identifier")
-    speed: Optional[float] = Field(default=1.0, description="Speed scaling of the speech audio")
+    voice: str | None = Field(default="en-IN-Wavenet-B", description="GCP TTS voice identifier")
+    speed: float | None = Field(default=1.0, description="Speed scaling of the speech audio")
+
 
 class SynthesizeResponse(BaseModel):
     audio_base64: str
     format: str
     duration_ms: int
 
+
 class PreferencesRequest(BaseModel):
-    tts_enabled: Optional[bool] = None
-    tts_voice: Optional[str] = None
-    tts_speed: Optional[float] = None
-    captions_enabled: Optional[bool] = None
-    caption_font_size: Optional[str] = None
-    sign_detection_enabled: Optional[bool] = None
-    overlay_position: Optional[str] = None
-    overlay_opacity: Optional[float] = None
+    tts_enabled: bool | None = None
+    tts_voice: str | None = None
+    tts_speed: float | None = None
+    captions_enabled: bool | None = None
+    caption_font_size: str | None = None
+    sign_detection_enabled: bool | None = None
+    overlay_position: str | None = None
+    overlay_opacity: float | None = None
+
 
 class PreferencesResponse(BaseModel):
     tts_enabled: bool

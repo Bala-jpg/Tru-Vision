@@ -10,6 +10,7 @@ from app.core.phrase_cache import lookup_phrase
 if genai and settings.GEMINI_API_KEY:
     genai.configure(api_key=settings.GEMINI_API_KEY)
 
+
 class CorrectionService:
     def __init__(self):
         self.model_name = "gemini-1.5-flash"
@@ -55,13 +56,13 @@ class CorrectionService:
             # We run in executor for async compatibility if calling sync libraries
             # google-generativeai is synchronous under the hood for generate_content
             import asyncio
+
             loop = asyncio.get_event_loop()
             response = await loop.run_in_executor(
-                None, 
+                None,
                 lambda: self.model.generate_content(
-                    prompt,
-                    generation_config={"temperature": 0.1, "max_output_tokens": 64}
-                )
+                    prompt, generation_config={"temperature": 0.1, "max_output_tokens": 64}
+                ),
             )
             return response.text.strip()
         except Exception as e:

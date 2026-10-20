@@ -1,7 +1,7 @@
-import os
 import json
+import os
+
 import numpy as np
-from typing import Optional
 
 # Gracefully import tensorflow to avoid crash if not installed
 try:
@@ -9,17 +9,22 @@ try:
 except ImportError:
     tf = None
 
+
 class SignService:
     def __init__(self):
-        self.model: Optional[object] = None
+        self.model: object | None = None
         self.label_map: dict = {}
         self.model_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "ml", "sign_model", "weights"
+            "ml",
+            "sign_model",
+            "weights",
         )
         self.label_map_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "ml", "data", "label_map.json"
+            "ml",
+            "data",
+            "label_map.json",
         )
         self.load_model()
         self.load_label_map()
@@ -43,7 +48,7 @@ class SignService:
     def load_label_map(self):
         if os.path.exists(self.label_map_path):
             try:
-                with open(self.label_map_path, "r") as f:
+                with open(self.label_map_path) as f:
                     self.label_map = json.load(f)
                 print("Loaded label map mapping indices to signs.")
             except Exception as e:
@@ -60,7 +65,7 @@ class SignService:
                 "6": "no",
                 "7": "wait",
                 "8": "stop",
-                "9": "meeting"
+                "9": "meeting",
             }
 
     def predict(self, landmarks_sequence: list) -> tuple[str, float]:
@@ -74,7 +79,7 @@ class SignService:
         # Ensure correct length (pad or truncate to 30 frames)
         target_len = 30
         seq_len = len(landmarks_sequence)
-        
+
         if seq_len < target_len:
             # Pad with zeros
             padding_dims = len(landmarks_sequence[0]) if seq_len > 0 else 126
@@ -88,7 +93,10 @@ class SignService:
         if self.model is None:
             # Random mock choice from label map for testing client-server flow
             import random
-            random.seed(sum(landmarks_sequence[0]) if landmarks_sequence and landmarks_sequence[0] else 42)
+
+            random.seed(
+                sum(landmarks_sequence[0]) if landmarks_sequence and landmarks_sequence[0] else 42
+            )
             mock_idx = str(random.randint(0, len(self.label_map) - 1))
             label = self.label_map.get(mock_idx, "hello")
             confidence = float(random.uniform(0.75, 0.98))
